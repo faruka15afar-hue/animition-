@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Visual Experience</title>
+
+    <style>
+
+        /* =========================================
+           GLOBAL RESET
+        ========================================= */
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =========================================
+           DOCUMENT
+        ========================================= */
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            min-width: 100%;
+            min-height: 100%;
+
+            overflow: hidden;
+
+            background: #000;
+        }
+
+
+        body {
+            position: relative;
+
+            width: 100vw;
+            height: 100vh;
+
+            overscroll-behavior: none;
+        }
+
+
+        /* =========================================
+           MAIN VISUAL CONTAINER
+        ========================================= */
+
+        .experience {
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100vw;
+            height: 100vh;
+
+            overflow: hidden;
+
+            background: #000;
+
+            isolation: isolate;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* =========================================
+           VISUAL SURFACE
+        ========================================= */
+
+        .surface {
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #000;
+        }
+
+
+        /* =========================================
+           VISUAL ASSET
+        ========================================= */
+
+        .visual {
+
+            position: relative;
+
+            display: block;
+
+            /*
+             * Keep the source aspect ratio.
+             */
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+
+            object-position: center center;
+
+            /*
+             * No visible player UI.
+             */
+            border: 0;
+            outline: 0;
+
+            /*
+             * Treat it as a visual layer.
+             */
+            pointer-events: none;
+
+            user-select: none;
+            -webkit-user-select: none;
+
+            -webkit-touch-callout: none;
+
+            /*
+             * Prevent unwanted rendering artifacts.
+             */
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+
+            transform: translateZ(0);
+
+            -webkit-transform: translateZ(0);
+
+            will-change: opacity;
+
+            /*
+             * Hidden until playback actually begins.
+             */
+            opacity: 0;
+            visibility: hidden;
+
+            transition:
+                opacity 120ms linear;
+        }
+
+
+        /* =========================================
+           READY STATE
+        ========================================= */
+
+        .visual.ready {
+
+            opacity: 1;
+
+            visibility: visible;
+        }
+
+
+        /* =========================================
+           DESKTOP
+        ========================================= */
+
+        @media (min-width: 769px) {
+
+            .experience {
+                width: 100vw;
+                height: 100vh;
+            }
+
+            .surface {
+                width: 100vw;
+                height: 100vh;
+            }
+
+            .visual {
+                width: 100%;
+                height: 100%;
+
+                object-fit: contain;
+            }
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media (max-width: 768px) {
+
+            .experience {
+                width: 100vw;
+                height: 100dvh;
+            }
+
+            .surface {
+                width: 100vw;
+                height: 100dvh;
+            }
+
+            .visual {
+                width: 100%;
+                height: 100%;
+
+                object-fit: contain;
+            }
+        }
+
+
+        /* =========================================
+           SMALL MOBILE DEVICES
+        ========================================= */
+
+        @media (max-width: 480px) {
+
+            .experience {
+                width: 100vw;
+                height: 100dvh;
+            }
+
+            .surface {
+                width: 100vw;
+                height: 100dvh;
+            }
+
+            .visual {
+                width: 100%;
+                height: 100%;
+
+                object-fit: contain;
+            }
+        }
+
+
+        /* =========================================
+           REDUCED MOTION
+        ========================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .visual {
+                transition: none;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =========================================
+         VISUAL EXPERIENCE
+    ========================================= -->
+
+    <main
+        class="experience"
+        aria-label="Visual experience"
+    >
+
+        <div
+            class="surface"
+            aria-hidden="true"
+        >
+
+            <video
+                id="visualSurface"
+
+                class="visual"
+
+                autoplay
+                muted
+                loop
+                playsinline
+
+                webkit-playsinline
+
+                preload="auto"
+
+                disablepictureinpicture
+
+                disableremoteplayback
+
+                tabindex="-1"
+            >
+
+                <source
+                    src="https://res.cloudinary.com/fxq8b9vn/video/upload/v1789626843/lv_0_20260917123228.mp4"
+                    type="video/mp4"
+                >
+
+            </video>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        /* =========================================
+           VISUAL ENGINE
+        ========================================= */
+
+        (() => {
+
+            "use strict";
+
+
+            /* -------------------------------------
+               GET VISUAL ELEMENT
+            ------------------------------------- */
+
+            const visual =
+                document.getElementById(
+                    "visualSurface"
+                );
+
+
+            /* -------------------------------------
+               SAFETY CHECK
+            ------------------------------------- */
+
+            if (!visual) {
+                return;
+            }
+
+
+            /* -------------------------------------
+               PLAYER STATE
+            ------------------------------------- */
+
+            visual.controls = false;
+
+            visual.autoplay = true;
+
+            visual.muted = true;
+
+            visual.defaultMuted = true;
+
+            visual.loop = true;
+
+            visual.playsInline = true;
+
+
+            /* -------------------------------------
+               FORCE INLINE PLAYBACK
+            ------------------------------------- */
+
+            visual.setAttribute(
+                "playsinline",
+                ""
+            );
+
+            visual.setAttribute(
+                "webkit-playsinline",
+                ""
+            );
+
+
+            /* -------------------------------------
+               START FUNCTION
+            ------------------------------------- */
+
+            const start = () => {
+
+                visual.muted = true;
+
+                const promise =
+                    visual.play();
+
+                if (
+                    promise &&
+                    typeof promise.catch ===
+                    "function"
+                ) {
+
+                    promise.catch(
+                        () => {}
+                    );
+                }
+
+            };
+
+
+            /* -------------------------------------
+               REVEAL AFTER PLAYBACK
+            ------------------------------------- */
+
+            visual.addEventListener(
+                "playing",
+                () => {
+
+                    visual.classList.add(
+                        "ready"
+                    );
+
+                },
+                {
+                    passive: true
+                }
+            );
+
+
+            /* -------------------------------------
+               CAN PLAY
+            ------------------------------------- */
+
+            visual.addEventListener(
+                "canplay",
+                () => {
+
+                    start();
+
+                },
+                {
+                    passive: true
+                }
+            );
+
+
+            /* -------------------------------------
+               INITIAL LOAD
+            ------------------------------------- */
+
+            if (
+                document.readyState ===
+                "loading"
+            ) {
+
+                document.addEventListener(
+                    "DOMContentLoaded",
+                    start,
+                    {
+                        once: true
+                    }
+                );
+
+            } else {
+
+                start();
+
+            }
+
+
+            /* -------------------------------------
+               AUTOPLAY FALLBACK
+            ------------------------------------- */
+
+            window.addEventListener(
+                "load",
+                start,
+                {
+                    once: true
+                }
+            );
+
+
+            /* -------------------------------------
+               MOBILE FALLBACK
+            ------------------------------------- */
+
+            document.addEventListener(
+                "touchstart",
+                start,
+                {
+                    once: true,
+                    passive: true
+                }
+            );
+
+
+            /* -------------------------------------
+               DESKTOP FALLBACK
+            ------------------------------------- */
+
+            document.addEventListener(
+                "click",
+                start,
+                {
+                    once: true
+                }
+            );
+
+
+            /* -------------------------------------
+               TAB VISIBILITY
+            ------------------------------------- */
+
+            document.addEventListener(
+                "visibilitychange",
+                () => {
+
+                    if (
+                        !document.hidden
+                    ) {
+
+                        start();
+
+                    }
+
+                }
+            );
+
+
+            /* -------------------------------------
+               KEEP LOOP ACTIVE
+            ------------------------------------- */
+
+            visual.addEventListener(
+                "ended",
+                () => {
+
+                    visual.currentTime = 0;
+
+                    start();
+
+                }
+            );
+
+
+        })();
+
+    </script>
+
+</body>
+</html>
